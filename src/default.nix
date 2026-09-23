@@ -11,6 +11,7 @@ let
     types = import ./types.nix ng nt1 nt2;
 
     inherit (lib.modules)
+      evalModules
       resolveModule
       ;
 

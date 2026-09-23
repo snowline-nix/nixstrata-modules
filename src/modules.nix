@@ -63,6 +63,7 @@
     config = let
       conv = o:
         let decl = o.declarations; t = typeOf decl; in
+        if !(o ? declarations) then o else
         if t == "set" then genAttrs (attrNames decl) (name: conv decl.${name}) else
         if t == "list" then remapElems decl conv else
         decl;

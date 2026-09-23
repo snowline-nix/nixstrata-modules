@@ -25,8 +25,13 @@
     modules ? [],
     inputs ? {},
     class ? null,
+
+    includeConfigInInputs ? true,
   }@evalModuleInputs: let
-    moduleDefs = joinLists (remapElems modules (resolveModule inputs));
+
+    inputs' = if includeConfigInInputs then inputs // { config = config; } else inputs;
+
+    moduleDefs = joinLists (remapElems modules (resolveModule inputs'));
 
     options = let
       merge = a: b: let
@@ -58,8 +63,7 @@
       context = { inherit type; path = []; };
       declarations = (remapElems moduleDefs (mod: mod.config));
     };
-  in {
-    _type = if evalModuleInputs ? class then "module.${class}" else "module";
+
     config = let
       conv = o:
         let decl = o.declarations; t = typeOf decl; in
@@ -69,5 +73,9 @@
         decl;
     in
       conv eval;
+  in {
+    _type = if evalModuleInputs ? class then "module.${class}" else "module";
+    inherit config;
+    inputs = inputs';
   };
 }
